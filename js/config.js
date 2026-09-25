@@ -144,76 +144,76 @@ const CONFIG = {
 
   // Danh sách các điều ước mẫu ấm áp để Linh Đan chọn nhanh khi thả thiên đăng lên Cung Trăng
   wishPresets: [
-    "Mong anh đi làm bớt mệt, luôn mạnh khỏe và nhớ em thật nhiều mỗi ngày ❤️",
-    "Nhanh nhanh đến ngày được gặp nhau để anh dắt em đi ăn lẩu ăn nướng bù nhé 🍲😋",
-    "Yêu xa nhưng lòng không xa, mong hai đứa mình cùng cố gắng vượt qua tất cả 💕",
-    "Hôm nào gặp nhau anh phải ôm em thật chặt và bế em như đã hứa đấy nha! 🫂",
-    "Hẹn mùa Trung Thu sau anh phải chở em đi dạo phố rước đèn thật sự nhé 🛵🏮",
-    "Chúc anh Trung Thu vui vẻ, nhớ ngủ sớm giữ sức khỏe đừng thức khuya làm việc nữa 🌙",
-    "Cảm ơn anh vì lúc nào cũng dịu dàng, kiên nhẫn và yêu thương em ❤️"
+    "Mong hai đứa mình luôn bình yên, mỗi ngày mở mắt ra đều thấy nụ cười của nhau ❤️",
+    "Mong anh đi làm bớt áp lực, luôn mạnh khỏe để cùng em nấu cơm và về chung một nhà 🍲🏡",
+    "Trung Thu này cùng anh ngắm trăng, ăn bánh và nắm tay nhau đi qua thật nhiều mùa trăng nữa 💕",
+    "Tối nay đi làm về anh phải ôm em thật chặt và nấu món ngon cho em đấy nha! 🫂",
+    "Tối nay hai đứa mình cùng dắt nhau đi dạo phố rước đèn ăn kem nhé 🛵🏮",
+    "Chúc anh luôn vui vẻ, nhiều năng lượng và mãi yêu chiều em như ngày đầu 🌙",
+    "Cảm ơn anh vì lúc nào cũng dịu dàng, kiên nhẫn và luôn chăm sóc em từng chút một ❤️"
   ],
 
-  // 🎟️ BỘ PHIẾU HẸN ƯỚC YÊU XA (Cam kết thực hiện 100% ngoài đời)
+  // 🎟️ BỘ PHIẾU HẸN ƯỚC TÌNH YÊU (Cam kết thực hiện 100% ngoài đời)
   vouchers: [
     {
       id: "trasua",
       icon: "🧋",
       title: "Ting Ting Trà Sữa / Bữa Ăn Đêm",
-      desc: "Anh phải ting ting hoặc order ngay 1 ly trà sữa / món ăn đêm nóng hổi theo ý Linh Đan!",
+      desc: "Anh phải order ngay 1 ly trà sữa / đồ ăn khuya nóng hổi về tận nhà cho Linh Đan!",
       tag: "Thực hiện ngay hôm nay",
-      code: "LDR-TRASUA-LINHDAN",
-      commitment: "Anh cam kết sẽ mở app chuyển khoản hoặc order ngay món Linh Đan thèm không chậm trễ 1 phút!",
-      msgTemplate: "Anh ơiii! Em vừa thả đèn Cung Trăng trúng 'Phiếu Trà Sữa / Bữa Đêm', anh mau ting ting khao em đi nè! 🧋😋"
+      code: "LOVE-TRASUA-LINHDAN",
+      commitment: "Anh cam kết sẽ mở app đặt ngay món Linh Đan thèm về nhà ăn cùng nhau không chậm trễ!",
+      msgTemplate: "Anh ơiii! Em vừa rút 'Phiếu Trà Sữa / Bữa Đêm', anh mau order về nhà khao em ăn cùng đi nè! 🧋😋"
     },
     {
-      id: "facetime",
-      icon: "📱",
-      title: "FaceTime Ngắm Trăng Xuyên Đêm",
-      desc: "Gác lại mọi việc bận rộn, mở video call ngắm trăng nói chuyện cùng Linh Đan tới khi ngủ say.",
-      tag: "Thực hiện ngay đêm nay",
-      code: "LDR-FACETIME-24H",
-      commitment: "Anh cam kết mở camera ngắm trăng, dỗ Linh Đan ngủ và không được cúp máy trước!",
-      msgTemplate: "Alo anh người yêu! Em vừa kích hoạt 'Phiếu FaceTime Ngắm Trăng Xuyên Đêm' trên Cung Trăng, mau mở máy call với em đi! 🌙📱"
+      id: "xemphim",
+      icon: "🎬",
+      title: "Cùng Nhau Xem Phim & Ngắm Trăng",
+      desc: "Gác lại mọi việc bận rộn, chuẩn bị đồ ăn vặt và cùng Linh Đan cuộn chăn xem phim tới khi ngủ say.",
+      tag: "Thực hiện ngay tối nay",
+      code: "LOVE-CINEMA-HOME",
+      commitment: "Anh cam kết chọn đúng bộ phim Linh Đan thích, ôm em xem phim và dỗ em ngủ ngon!",
+      msgTemplate: "Anh ơi! Em vừa kích hoạt 'Phiếu Cùng Nhau Xem Phim', tối nay gác việc lại nằm xem phim cùng em nhé! 🎬🍿"
     },
     {
       id: "omchat",
       icon: "🫂",
       title: "Ôm Thật Chặt 10 Phút & Bế Bổng",
-      desc: "Ngày gặp lại ở ngoài đời: Anh phải ôm Linh Đan thật chặt không buông và bế Linh Đan đến khi hết sức!",
-      tag: "Khi hai đứa gặp lại",
-      code: "LDR-OMCHAT-BEBONG",
-      commitment: "Cam kết gặp nhau ở bến xe/sân bay là ôm chặt 10 phút, bế bổng xoay vòng bù đắp những ngày yêu xa!",
-      msgTemplate: "Em đã lưu lại 'Phiếu Ôm Chặt 10 Phút & Bế Bổng' rồi nhé, hôm nào gặp nhau là anh phải trả nợ đủ đấy! 🫂❤️"
+      desc: "Mỗi ngày về nhà: Anh phải ôm Linh Đan thật chặt không buông và bế Linh Đan đi quanh nhà!",
+      tag: "Mỗi ngày đi làm về",
+      code: "LOVE-OMCHAT-BEBONG",
+      commitment: "Cam kết cứ về tới nhà là ôm chặt 10 phút, bế bổng xoay vòng nạp năng lượng cho Linh Đan!",
+      msgTemplate: "Em đã lưu lại 'Phiếu Ôm Chặt 10 Phút & Bế Bổng' rồi nhé, về nhà là anh phải thực hiện ngay đấy! 🫂❤️"
     },
     {
       id: "ansap",
       icon: "🍲",
       title: "Bao Trọn Gói Ăn Sập Quán Linh Đan Thích",
-      desc: "Dắt Linh Đan đi ăn tất cả món lẩu nướng, kem, bánh ngọt... mà Linh Đan thèm bấy lâu nay.",
-      tag: "Khi hai đứa gặp lại",
-      code: "LDR-ANSAP-TIEM",
+      desc: "Cuối tuần dắt Linh Đan đi ăn tất cả món lẩu nướng, kem, bánh ngọt... mà Linh Đan thèm.",
+      tag: "Hẹn hò cuối tuần",
+      code: "LOVE-ANSAP-TIEM",
       commitment: "Anh tài trợ 100% kinh phí ăn uống, chở Linh Đan đi ăn tất cả các quán trong wish-list của Linh Đan!",
-      msgTemplate: "Em đã chọn 'Phiếu Ăn Sập Quán Em Thích' trên Cung Trăng, anh chuẩn bị ví tiền với tinh thần dắt em đi nhé! 🍲🥩"
+      msgTemplate: "Em đã chọn 'Phiếu Ăn Sập Quán Em Thích', cuối tuần này anh chở em đi ăn no nê nhé! 🍲🥩"
     },
     {
       id: "nuhoang",
       icon: "👑",
       title: "24 Giờ Làm Nữ Hoàng Của Anh",
-      desc: "Trong 1 ngày nguyên vẹn, Linh Đan nói gì anh cũng phải ngoan ngoãn nghe lời 100%, cấm cãi nửa lời!",
+      desc: "Trong 1 ngày trọn vẹn ở nhà, Linh Đan nói gì anh cũng phải ngoan ngoãn nghe lời 100%, làm hết việc nhà cấm cãi nửa lời!",
       tag: "Hiệu lực 24 giờ",
-      code: "LDR-NUHOANG-24H",
-      commitment: "Tuyệt đối phục tùng, nhận lỗi ngay khi Linh Đan giận dỗi, cấm phản bác dưới mọi hình thức!",
+      code: "LOVE-NUHOANG-24H",
+      commitment: "Tuyệt đối phục tùng, nấu cơm dọn dẹp và cưng chiều Linh Đan từ sáng tới tối!",
       msgTemplate: "Lệnh từ Nữ Hoàng Linh Đan: Em vừa kích hoạt 'Phiếu 24 Giờ Làm Nữ Hoàng', hôm nay anh phải nghe lời em răm rắp nha! 👑💅"
     },
     {
       id: "matxa",
       icon: "💆‍♀️",
       title: "Vé Massage Đấm Lưng Bóp Vai Trọn Đời",
-      desc: "Mỗi khi Linh Đan kêu mỏi người, đau lưng là anh phải tự giác xoa bóp đến khi Linh Đan ưng ý.",
+      desc: "Mỗi tối sau khi đi làm về mệt, anh tự giác massage xoa bóp cho Linh Đan đến khi em ngủ ngon.",
       tag: "Bản quyền trọn đời",
-      code: "LDR-MASSAGE-VIP",
-      commitment: "Bàn tay vàng sẵn sàng phục vụ Linh Đan mọi lúc mọi nơi sau những giờ học và làm việc mệt mỏi!",
-      msgTemplate: "Ting ting! Em vừa rút 'Vé Massage Đấm Lưng Bóp Vai Trọn Đời', hôm nào gặp anh phải xoa bóp cho em đã đời nhé! 💆‍♀️✨"
+      code: "LOVE-MASSAGE-VIP",
+      commitment: "Bàn tay vàng sẵn sàng phục vụ Linh Đan mỗi tối sau những giờ làm việc mệt mỏi!",
+      msgTemplate: "Ting ting! Em vừa rút 'Vé Massage Đấm Lưng Bóp Vai Trọn Đời', tối nay anh nhớ xoa bóp cho em đã đời nhé! 💆‍♀️✨"
     }
   ],
 

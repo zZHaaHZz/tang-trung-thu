@@ -283,7 +283,7 @@ class MidAutumnApp {
     // 2. Kích hoạt bộ đếm thời gian yêu nhau Live Real-time (Từng giây từ 03-09 đến Date.now())
     this.startLiveLoveTimer();
 
-    // 3. Khởi tạo danh sách Phiếu Hẹn Ước Yêu Xa (Dạng thẻ hàng ngang đầy đủ thông tin)
+    // 3. Khởi tạo danh sách Phiếu Hẹn Ước Tình Yêu (Dạng thẻ hàng ngang đầy đủ thông tin)
     const vouchersList = document.getElementById('vouchers-list');
     this.selectedVoucher = this.config.vouchers ? this.config.vouchers[0] : null;
 
@@ -562,13 +562,13 @@ class MidAutumnApp {
         polaroidImg.style.opacity = '0';
         setTimeout(() => {
           polaroidImg.src = 'assets/images/couple.jpg';
-          if (polaroidCaption) polaroidCaption.textContent = 'Hôm nào gặp lại nắm chặt như này tiếp nhé! 🤝❤️';
+          if (polaroidCaption) polaroidCaption.textContent = 'Mỗi ngày đều nắm chặt tay nhau như này em nhé! 🤝❤️';
           polaroidImg.style.opacity = '1';
         }, 150);
       });
     }
 
-    // Nút Thả Đèn Trời Ước Nguyện & Phiếu Hẹn Ước Yêu Xa
+    // Nút Thả Đèn Trời Ước Nguyện & Phiếu Hẹn Ước Tình Yêu
     const btnWishLantern = document.getElementById('btn-wish-lantern');
     const btnCloseWish = document.getElementById('btn-close-wish');
     const wishModal = document.getElementById('wish-modal');
@@ -631,7 +631,7 @@ class MidAutumnApp {
       });
     }
 
-    // Nút Thả Đèn Tab 1: Phiếu Hẹn Ước Yêu Xa
+    // Nút Thả Đèn Tab 1: Phiếu Hẹn Ước Tình Yêu
     const btnSendVoucherWish = document.getElementById('btn-send-voucher-wish');
     const voucherCustomNote = document.getElementById('voucher-custom-note');
 
@@ -1023,7 +1023,7 @@ class MidAutumnApp {
   }
 
   // =========================================================
-  // 🎟️ PHIẾU HẸN ƯỚC YÊU XA (LOVE VOUCHER TICKET MODAL)
+  // 🎟️ PHIẾU HẸN ƯỚC TÌNH YÊU (LOVE VOUCHER TICKET MODAL)
   // =========================================================
   showLoveVoucherModal(voucher, customNote) {
     const voucherModal = document.getElementById('voucher-modal');
@@ -1053,14 +1053,14 @@ class MidAutumnApp {
         ? `Anh ơi! Em vừa thả đèn Cung Trăng và chọn '${voucher.title}': "${customNote}". Anh chuẩn bị thực hiện cho em nhé! 💋`
         : voucher.msgTemplate;
     } else {
-      if (ticketTitle) ticketTitle.textContent = "Điều Ước Cung Trăng Yêu Xa";
+      if (ticketTitle) ticketTitle.textContent = "Điều Ước Cung Trăng Tình Yêu";
       if (ticketTag) ticketTag.textContent = "Hiệu lực vĩnh viễn";
       if (ticketIcon) ticketIcon.textContent = "🏮";
       if (ticketDesc) ticketDesc.textContent = customNote || "Mong hai đứa mình mãi hạnh phúc bền lâu!";
-      if (ticketCommitment) ticketCommitment.textContent = "Anh cam kết sẽ luôn lắng nghe, chở che và bù đắp cho Linh Đan sau những tháng ngày yêu xa!";
+      if (ticketCommitment) ticketCommitment.textContent = "Anh cam kết sẽ luôn lắng nghe, chở che và đồng hành cùng Linh Đan mỗi ngày!";
       if (ticketCode) ticketCode.textContent = finalCode;
 
-      this.currentVoucherMsg = `Anh ơi! Em vừa gửi điều ước lên Cung Trăng: "${customNote || 'Mong hai đứa mình sớm gặp lại'}". Anh nhớ thực hiện cho em nha! ❤️`;
+      this.currentVoucherMsg = `Anh ơi! Em vừa gửi điều ước lên Cung Trăng: "${customNote || 'Mong hai đứa mình mãi bình yên bên nhau'}". Anh nhớ thực hiện cho em nha! ❤️`;
     }
 
     // Gửi thông báo ngầm về Telegram Bot của Anh (Bí mật 100%)
@@ -1150,7 +1150,7 @@ class MidAutumnApp {
     let message = '';
 
     if (voucher) {
-      // Trường hợp 1: Linh Đan rút Phiếu Hẹn Ước Yêu Xa (Tab 1)
+      // Trường hợp 1: Linh Đan rút Phiếu Hẹn Ước Tình Yêu (Tab 1)
       const customText = customNote ? `"${escapeHtml(customNote)}"` : '(Linh Đan không ghi chú thêm)';
       message = `🌕 <b>CUNG TRĂNG BÁO TIN TỪ LINH ĐAN</b> 🏮\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +

@@ -1453,7 +1453,7 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Danh sách Thẻ Phiếu Hẹn Ước Yêu Xa (Full-width, thoáng, không cụt chữ) */
+/* Danh sách Thẻ Phiếu Hẹn Ước Tình Yêu (Full-width, thoáng, không cụt chữ) */
 .voucher-list-scroll {
   max-height: 38dvh;
   overflow-y: auto;
