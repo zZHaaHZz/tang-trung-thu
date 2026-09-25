@@ -72,7 +72,9 @@ export class AudioManager {
       const targetVol = (this.config && typeof this.config.volume === 'number') ? this.config.volume : 0.25;
       this.audioElement.volume = targetVol;
       if (this.toggleBtn) {
-        this.toggleBtn.title = `Nhạc: ${track.title} (Bấm: Bật/Tắt • Bấm đúp: Đổi bài)`;
+        this.toggleBtn.title = this.playlist.length > 1
+          ? `Nhạc: ${track.title} (Bấm: Bật/Tắt • Bấm đúp: Đổi bài)`
+          : `Nhạc: ${track.title} (Bấm: Bật/Tắt nhạc)`;
       }
     }
   }

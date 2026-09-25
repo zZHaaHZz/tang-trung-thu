@@ -93,28 +93,16 @@ const CONFIG = {
     }
   ],
 
-  // Nhạc nền (BGM) - Giai điệu tình ca ngọt ngào, hạnh phúc & bình yên (Âm lượng dịu nhẹ du dương)
+  // Nhạc nền (BGM) - Chỉ phát duy nhất 1 bài Nơi Này Có Anh theo yêu cầu
   music: {
-    volume: 0.25, // Âm lượng êm ái vừa vặn, không bị to
-    title: "Ánh Nắng Của Anh - Đức Phúc 💕",
-    audioUrl: "assets/audio/anh-nang-cua-anh.mp3",
+    volume: 0.28, // Âm lượng êm ái vừa vặn, du dương
+    title: "Nơi Này Có Anh - Sơn Tùng M-TP ✨",
+    audioUrl: "assets/audio/noi-nay-co-anh.mp3",
     autoPlayPrompt: true,
     playlist: [
       {
-        title: "Ánh Nắng Của Anh - Đức Phúc 💕",
-        url: "assets/audio/anh-nang-cua-anh.mp3"
-      },
-      {
         title: "Nơi Này Có Anh - Sơn Tùng M-TP ✨",
         url: "assets/audio/noi-nay-co-anh.mp3"
-      },
-      {
-        title: "Em Đồng Ý (I Do) - Đức Phúc x 911 💍",
-        url: "assets/audio/em-dong-y-i-do.mp3"
-      },
-      {
-        title: "Ngày Đầu Tiên - Đức Phúc 🌸",
-        url: "assets/audio/ngay-dau-tien.mp3"
       }
     ]
   },
