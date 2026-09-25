@@ -1603,19 +1603,49 @@ class MidAutumnApp {
     const current = this.photoList[this.currentPhotoIndex];
     if (!current) return;
 
-    const mainImg = document.getElementById('album-main-img');
+    const imgA = document.getElementById('album-main-img');
+    const imgB = document.getElementById('album-main-img-b');
     const captionEl = document.getElementById('album-photo-caption');
     const counterEl = document.getElementById('album-counter');
 
-    if (mainImg) {
-      mainImg.style.opacity = '0.4';
-      mainImg.src = current.url;
-      mainImg.onload = () => {
-        mainImg.style.opacity = '1';
+    // Cross-fade: xác định layer nào đang active
+    const useLayerSystem = imgA && imgB;
+
+    if (useLayerSystem) {
+      const aIsActive = imgA.classList.contains('active');
+      const incoming = aIsActive ? imgB : imgA;
+      const outgoing = aIsActive ? imgA : imgB;
+
+      // Load ảnh mới vào layer đang ẩn
+      incoming.src = current.url;
+      incoming.onload = () => {
+        // Khi ảnh mới load xong: fade in incoming, fade out outgoing
+        incoming.classList.add('active');
+        outgoing.classList.remove('active');
       };
+      // Fallback nếu ảnh đã cache (onload không trigger)
+      if (incoming.complete && incoming.naturalWidth > 0) {
+        incoming.classList.add('active');
+        outgoing.classList.remove('active');
+      }
+    } else if (imgA) {
+      // Fallback: opacity fade đơn giản
+      imgA.style.opacity = '0';
+      setTimeout(() => {
+        imgA.src = current.url;
+        imgA.style.opacity = '1';
+      }, 200);
     }
+
+    // Caption và counter fade nhẹ
     if (captionEl) {
-      captionEl.textContent = current.caption || 'Khoảnh khắc bình yên bên em ❤️';
+      captionEl.style.opacity = '0';
+      captionEl.style.transform = 'translateY(4px)';
+      setTimeout(() => {
+        captionEl.textContent = current.caption || 'Khoảnh khắc bình yên bên em ❤️';
+        captionEl.style.opacity = '1';
+        captionEl.style.transform = 'translateY(0)';
+      }, 180);
     }
     if (counterEl) {
       counterEl.textContent = `${this.currentPhotoIndex + 1} / ${this.photoList.length}`;
