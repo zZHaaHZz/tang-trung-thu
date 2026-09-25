@@ -243,7 +243,9 @@ export class LanternManager {
         photoIndex: idx,
         photoInfo: photoItem,
         orbit: rf,          // orbit physics
+        baseX: initX,
         baseY: MOON_CY,     // tâm Y để bob xung quanh
+        baseZ: initZ,
         MOON_CX, MOON_CY, MOON_CZ,
       };
 
@@ -288,12 +290,11 @@ export class LanternManager {
         photoItem.url,
         (tex) => {
           tex.colorSpace = THREE.SRGBColorSpace;
-          // Tắt mipmaps và dùng LinearFilter để ảnh sắc nét tối đa khi dùng crop offset
-          tex.minFilter = THREE.LinearFilter;
+          // Bật mipmaps và LinearMipmapLinearFilter để khử hoàn toàn răng cưa và nhấp nháy, tối ưu GPU mobile
+          tex.generateMipmaps = true;
+          tex.minFilter = THREE.LinearMipmapLinearFilter;
           tex.magFilter = THREE.LinearFilter;
-          tex.generateMipmaps = false;
-          // Anisotropic filtering — giảm mờ khi nhìn khung ở góc nghiêng
-          tex.anisotropy = 16;
+          tex.anisotropy = 4;
           applyCoverCrop(tex, w, h, fx, fy);
           const mat = new THREE.MeshBasicMaterial({
             map: tex,
@@ -1408,10 +1409,18 @@ export class LanternManager {
         const cz = pl.userData.MOON_CZ;
 
         if (this.focusedPhotoIndex === idx) {
-          // Hover nhẹ tại vị trí orbit hiện tại khi focus
-          const hoverY = Math.sin(time * 1.2) * 0.15;
-          pl.position.y = THREE.MathUtils.lerp(pl.position.y, pl.position.y + hoverY, 0.05);
+          // Khi đang được focus ngắm nhìn: khóa X, Z và lơ lửng nhẹ nhàng Y, không bị trôi giật
+          if (pl.userData.lockedPos === undefined) {
+            pl.userData.lockedPos = { x: pl.position.x, y: pl.position.y, z: pl.position.z };
+          }
+          const hoverY = Math.sin(time * 1.5) * 0.12;
+          pl.position.set(
+            pl.userData.lockedPos.x,
+            pl.userData.lockedPos.y + hoverY,
+            pl.userData.lockedPos.z
+          );
         } else {
+          pl.userData.lockedPos = undefined;
           // Tiến góc quỹ đạo
           orb.orbitAngle += orb.orbitSpeed * 0.016; // ~60fps
 

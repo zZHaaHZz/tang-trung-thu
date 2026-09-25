@@ -152,7 +152,7 @@ class MidAutumnApp {
     this.camera.position.set(0, 15, isPortrait ? 58 : 42);
 
     this.renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile, // Tắt antialiasing trên mobile để giữ FPS 60 mượt mà
+      antialias: true, // Luôn bật antialias để khử hoàn toàn răng cưa trên cả mobile và desktop
       powerPreference: 'high-performance',
       precision: isMobile ? 'mediump' : 'highp',
       alpha: false,
@@ -160,9 +160,11 @@ class MidAutumnApp {
       depth: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // Tối ưu pixel ratio trên mobile (1.0) để giữ 60fps mượt tuyệt đối, mát máy không giật lag
-    this.renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.75));
-    this.renderer.toneMapping = isMobile ? THREE.LinearToneMapping : THREE.ACESFilmicToneMapping;
+    // Tối ưu pixel ratio: Retina mobile (2x-3x) dùng Math.min(window.devicePixelRatio || 1, 2.0)
+    // để nét căng mịn màng, triệt tiêu 100% răng cưa mà vẫn giữ 60fps mượt mà
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2.0);
+    this.renderer.setPixelRatio(pixelRatio);
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.42;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.container.appendChild(this.renderer.domElement);
@@ -1275,6 +1277,7 @@ class MidAutumnApp {
 
       this.camera.position.lerpVectors(startPos, targetPos, ease);
       this.controls.target.lerpVectors(startTarget, targetLookAt, ease);
+      this.camera.lookAt(this.controls.target);
 
       if (progress < 1.0) {
         this.camAnimId = requestAnimationFrame(animateCam);
@@ -1401,6 +1404,7 @@ class MidAutumnApp {
     // Hiện tất cả khung ảnh 3D
     this.lanterns.photoLanterns.forEach(l => { l.visible = true; });
 
+    document.body.classList.add('photo-tour-active');
     this.focusPhotoLantern(startIndex);
     this.startPhotoTourAutoplay();
     this.showToast('🌸 Đang ngắm góc ảnh của Linh Đan & tự động chuyển ảnh ✨');
@@ -1422,20 +1426,29 @@ class MidAutumnApp {
     }
 
     const isMobile = isMobileDevice();
-    const fp = lantern.userData.flightPath;
+    const lx = Number.isFinite(lantern.position.x) ? lantern.position.x : 0;
+    const ly = Number.isFinite(lantern.position.y) ? lantern.position.y : 14;
+    const lz = Number.isFinite(lantern.position.z) ? lantern.position.z : 10;
 
-    // Dùng ANCHOR position — đây là nơi frame sẽ ổn định về
-    // Camera đặt thẳng phía trước anchor (Z + camDist), nhìn thẳng vào anchor
-    // → frame (billboard lookAt camera) sẽ luôn nằm đúng giữa màn hình
-    const lx = fp ? fp.anchorX : lantern.userData.baseX;
-    const ly = fp ? fp.anchorY : lantern.userData.baseY;
-    const lz = fp ? fp.anchorZ : lantern.userData.baseZ;
+    // Hướng camera nhìn thẳng vào mặt trước của ảnh từ phía ngoài
+    const cx = lantern.userData.MOON_CX ?? 0;
+    const cz = lantern.userData.MOON_CZ ?? -16;
+    let dirX = lx - cx;
+    let dirZ = lz - cz;
+    const len = Math.hypot(dirX, dirZ) || 1;
+    dirX /= len;
+    dirZ /= len;
 
-    const camDist = isMobile ? 14 : 12;
-    const targetPos    = new THREE.Vector3(lx, ly, lz + camDist);
-    const targetLookAt = new THREE.Vector3(lx, ly, lz);
+    const camDist = isMobile ? 13.0 : 10.5;
+    const yOffset = isMobile ? 1.6 : 0.5;
+    const targetPos = new THREE.Vector3(
+      lx + dirX * camDist,
+      ly + yOffset,
+      lz + dirZ * camDist
+    );
+    const targetLookAt = new THREE.Vector3(lx, ly + (isMobile ? 1.2 : 0.3), lz);
 
-    this.smoothMoveCamera(targetPos, targetLookAt, 1100);
+    this.smoothMoveCamera(targetPos, targetLookAt, 1000);
 
     const photoInfo = lantern.userData.photoInfo;
     this.updatePhotoTourHUD(photoInfo, this.currentPhotoIndex, total);
@@ -1519,6 +1532,7 @@ class MidAutumnApp {
     if (this.lanterns) {
       this.lanterns.focusedPhotoIndex = -1;
     }
+    document.body.classList.remove('photo-tour-active');
     const tourBar = document.getElementById('photo-tour-bar');
     if (tourBar) tourBar.classList.add('hidden');
     this.switchCameraAngle('moon');
@@ -1655,7 +1669,7 @@ class MidAutumnApp {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.75));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
   }
 
   // Vòng lặp render chính (60fps) được bọc try-catch tuyệt đối an toàn

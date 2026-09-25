@@ -397,6 +397,17 @@ html, body {
   z-index: 100 !important;
   pointer-events: auto !important;
   max-width: 95vw;
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.3s ease;
+}
+
+body.photo-tour-active .bottom-dock {
+  transform: translateX(-50%) translateY(140%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.photo-tour-active .interaction-hint {
+  display: none !important;
 }
 
 .dock-btn {
@@ -2099,7 +2110,7 @@ textarea, input {
 
   /* Tối ưu Thanh Góc Ảnh Của Linh Đan trên Mobile */
   .photo-tour-bar {
-    bottom: calc(max(14px, env(safe-area-inset-bottom, 14px)) + 74px);
+    bottom: calc(max(14px, env(safe-area-inset-bottom, 14px)));
     width: 95vw;
     max-width: 95vw;
     padding: 10px 14px;
