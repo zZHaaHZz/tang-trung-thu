@@ -152,7 +152,7 @@ class MidAutumnApp {
     this.camera.position.set(0, 15, isPortrait ? 58 : 42);
 
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true, // Luôn bật antialias để khử hoàn toàn răng cưa trên cả mobile và desktop
+      antialias: !isMobile, // Desktop: bật antialias. Mobile: tắt để tăng FPS đáng kể
       powerPreference: 'high-performance',
       precision: isMobile ? 'mediump' : 'highp',
       alpha: false,
@@ -160,9 +160,11 @@ class MidAutumnApp {
       depth: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // Tối ưu pixel ratio: Retina mobile (2x-3x) dùng Math.min(window.devicePixelRatio || 1, 2.0)
-    // để nét căng mịn màng, triệt tiêu 100% răng cưa mà vẫn giữ 60fps mượt mà
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2.0);
+    // Mobile: dùng pixelRatio tối đa 1.5 để cân bằng nét và hiệu năng
+    // Desktop Retina: dùng tối đa 2.0
+    const pixelRatio = isMobile
+      ? Math.min(window.devicePixelRatio || 1, 1.5)
+      : Math.min(window.devicePixelRatio || 1, 2.0);
     this.renderer.setPixelRatio(pixelRatio);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.42;
@@ -251,14 +253,20 @@ class MidAutumnApp {
   // Khởi tạo các hệ thống 3D chuyên biệt
   initSubsystems() {
     this.audio = new AudioManager(this.config);
-    this.stars = new Starfield(this.scene, this.config.effects?.starCount || 2200);
+    // Mobile: giảm số sao để giải phóng GPU fill rate
+    const starCount = isMobileDevice()
+      ? Math.min(this.config.effects?.starCount || 1800, 1200)
+      : (this.config.effects?.starCount || 1800);
+    this.stars = new Starfield(this.scene, starCount);
     this.moon = new Moon(this.scene);
     this.floatingIsland = new FloatingIsland(this.scene, this.config);
     this.lanterns = new LanternManager(this.scene, this.config);
     this.fireworks = new FireworkManager(this.scene);
 
-    // Định kỳ sinh sao băng
-    const freq = this.config.effects?.shootingStarFrequency || 3200;
+    // Định kỳ sinh sao băng (môbile: tần suất thấp hơn)
+    const freq = isMobileDevice()
+      ? (this.config.effects?.shootingStarFrequency || 4500)
+      : (this.config.effects?.shootingStarFrequency || 3500);
     setInterval(() => {
       this.stars.spawnShootingStar();
     }, freq);
@@ -1669,7 +1677,10 @@ class MidAutumnApp {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
+    const newPixelRatio = isMobile
+      ? Math.min(window.devicePixelRatio || 1, 1.5)
+      : Math.min(window.devicePixelRatio || 1, 2.0);
+    this.renderer.setPixelRatio(newPixelRatio);
   }
 
   // Vòng lặp render chính (60fps) được bọc try-catch tuyệt đối an toàn

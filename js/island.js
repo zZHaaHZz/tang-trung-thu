@@ -870,20 +870,30 @@ export class FloatingIsland {
   // 9. ANIMATION LOOP CẬP NHẬT MỖI FRAME (UPDATE)
   // =========================================================
   update(delta) {
-    const time = Date.now() * 0.001;
+    if (!this._islandTime) this._islandTime = 0;
+    if (!this._islandFrame) this._islandFrame = 0;
+    this._islandTime += (delta || 0.016);
+    this._islandFrame++;
+    const time = this._islandTime;
+    const isMobile = this.isMobile;
 
     // 9.1 Hiệu ứng bồng bềnh tổng thể của Đảo Bay
     const floatY = Math.sin(time * 0.85) * 0.75;
     this.group.position.y = this.basePosition.y + floatY;
-    this.group.rotation.z = Math.sin(time * 0.5) * 0.012;
-    this.group.rotation.x = Math.cos(time * 0.45) * 0.008;
+    // Mobile: chỉ update rotation mỗi 2 frame
+    if (!isMobile || this._islandFrame % 2 === 0) {
+      this.group.rotation.z = Math.sin(time * 0.5) * 0.012;
+      this.group.rotation.x = Math.cos(time * 0.45) * 0.008;
+    }
 
-    // 9.2 Rễ cây xõa đung đưa
-    this.hangingRoots.forEach(r => {
-      const u = r.userData;
-      r.rotation.z = Math.sin(time * u.swaySpeed + u.phase) * 0.06;
-      r.rotation.x = Math.cos(time * u.swaySpeed * 0.8 + u.phase) * 0.04;
-    });
+    // 9.2 Rễ cây xõa đung đưa (mobile: mỗi 3 frame)
+    if (!isMobile || this._islandFrame % 3 === 0) {
+      this.hangingRoots.forEach(r => {
+        const u = r.userData;
+        r.rotation.z = Math.sin(time * u.swaySpeed + u.phase) * 0.06;
+        r.rotation.x = Math.cos(time * u.swaySpeed * 0.8 + u.phase) * 0.04;
+      });
+    }
 
     // 9.3 Các mảnh đá nhỏ xoay quanh đảo
     this.floatingMiniRocks.forEach(rock => {
@@ -892,27 +902,33 @@ export class FloatingIsland {
       rock.position.x = Math.cos(u.angle) * u.orbitRadius;
       rock.position.z = Math.sin(u.angle) * u.orbitRadius;
       rock.position.y = u.baseY + Math.sin(time * u.bobSpeed) * u.bobAmp;
-      rock.rotation.x += u.rotSpeedX;
-      rock.rotation.y += u.rotSpeedY;
+      if (!isMobile || this._islandFrame % 2 === 0) {
+        rock.rotation.x += u.rotSpeedX;
+        rock.rotation.y += u.rotSpeedY;
+      }
     });
 
-    // 9.4 Tán lá cây đa thở nhẹ theo gió thu
-    this.foliageClusters.forEach(f => {
-      f.position.y = f.userData.baseY + Math.sin(time * f.userData.swaySpeed + f.userData.phase) * 0.12;
-    });
+    // 9.4 Tán lá cây đa thở nhẹ theo gió thu (mobile: mỗi 3 frame)
+    if (!isMobile || this._islandFrame % 3 === 0) {
+      this.foliageClusters.forEach(f => {
+        f.position.y = f.userData.baseY + Math.sin(time * f.userData.swaySpeed + f.userData.phase) * 0.12;
+      });
+    }
 
-    // 9.5 Đèn lồng & dải lụa trên cây đung đưa
-    this.lanterns.forEach(l => {
-      l.rotation.z = Math.sin(time * l.userData.speed + l.userData.phase) * 0.12;
-      l.rotation.x = Math.cos(time * l.userData.speed * 0.9 + l.userData.phase) * 0.08;
-    });
-    this.ribbons.forEach(rib => {
-      rib.rotation.y = Math.sin(time * rib.userData.speed + rib.userData.phase) * 0.35;
-      rib.rotation.z = Math.cos(time * rib.userData.speed + rib.userData.phase) * 0.15;
-    });
+    // 9.5 Đèn lồng & dải lụa trên cây đung đưa (mobile: mỗi 2 frame)
+    if (!isMobile || this._islandFrame % 2 === 0) {
+      this.lanterns.forEach(l => {
+        l.rotation.z = Math.sin(time * l.userData.speed + l.userData.phase) * 0.12;
+        l.rotation.x = Math.cos(time * l.userData.speed * 0.9 + l.userData.phase) * 0.08;
+      });
+      this.ribbons.forEach(rib => {
+        rib.rotation.y = Math.sin(time * rib.userData.speed + rib.userData.phase) * 0.35;
+        rib.rotation.z = Math.cos(time * rib.userData.speed + rib.userData.phase) * 0.15;
+      });
+    }
 
-    // 9.6 Đom đóm bay lượn
-    if (this.fireflies) {
+    // 9.6 Đom đóm bay lượn (mobile: mỗi 3 frame)
+    if (this.fireflies && (!isMobile || this._islandFrame % 3 === 0)) {
       const pos = this.fireflies.geometry.attributes.position;
       for (let i = 0; i < pos.count; i++) {
         let y = pos.getY(i) + Math.sin(time * 2.0 + i) * 0.02;
@@ -926,8 +942,10 @@ export class FloatingIsland {
     // 9.7 Hoạt ảnh Chú Thỏ Ngọc chạy nhảy (Rabbit Animation)
     this.updateJadeRabbit(delta, time);
 
-    // 9.8 Cập nhật hạt bụi sao
-    this.updateRabbitSparkles(delta);
+    // 9.8 Cập nhật hạt bụi sao (mobile: mỗi 2 frame)
+    if (!isMobile || this._islandFrame % 2 === 0) {
+      this.updateRabbitSparkles(delta);
+    }
   }
 
   // Quản lý chuyển động chạy nhảy của Thỏ Ngọc

@@ -254,14 +254,18 @@ export class Moon {
   }
 
   update(delta) {
-    const time = Date.now() * 0.001;
+    if (!this._moonTime) this._moonTime = 0;
+    if (!this._moonFrame) this._moonFrame = 0;
+    this._moonTime += (delta || 0.016);
+    this._moonFrame++;
+    const time = this._moonTime;
 
     if (this.mesh) {
       this.mesh.rotation.y += 0.0008;
     }
 
-    // Rim thở nhẹ
-    if (this.rimMesh && this.rimMesh.material.uniforms) {
+    // Rim thở nhẹ (mỗi 2 frame)
+    if (this._moonFrame % 2 === 0 && this.rimMesh && this.rimMesh.material.uniforms) {
       const rimPulse = Math.sin(time * 0.8) * 0.06 + 1.0;
       this.rimMesh.scale.set(rimPulse, rimPulse, rimPulse);
     }
@@ -271,7 +275,8 @@ export class Moon {
       this.moonDust.rotation.x += 0.00015;
     }
 
-    if (this.moonLight) {
+    // MoonLight pulse (mỗi 3 frame để giảm tải)
+    if (this._moonFrame % 3 === 0 && this.moonLight) {
       this.moonLight.intensity = (3.3 + Math.sin(time * 1.0) * 0.3) * (0.15 + 0.85 * this.glowFactor);
     }
   }

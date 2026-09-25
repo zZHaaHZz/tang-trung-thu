@@ -60,8 +60,12 @@ export class LanternManager {
 
   init() {
     const isMobile = isMobileDevice();
+    this.isMobile = isMobile;
+    this._frameCount = 0;
+    this._time = 0;
     this.createDaoPhotoLanterns();
-    const count = isMobile ? 28 : (this.config.effects?.floatingLanterns || 55);
+    // Mobile: giảm mạnh số lượng đèn để giải phóng GPU/CPU
+    const count = isMobile ? 16 : (this.config.effects?.floatingLanterns || 30);
     this.createSkyLanterns(count);
   }
 
@@ -1353,7 +1357,7 @@ export class LanternManager {
     haloSprite.scale.set(10, 10, 1);
     group.add(haloSprite);
 
-    // Xuất phát từ phía trước người nhìn (dưới góc nhìn camera)
+    // Xuất phát từ phía trước người nhìn
     group.position.set(
       THREE.MathUtils.randFloatSpread(10),
       -14,
@@ -1376,30 +1380,39 @@ export class LanternManager {
   }
 
   // =========================================================
-  // CẬP NHẬT HOẠT ẢNH MỖI FRAME
+  // CẬP NHẬT HOẠT ẢNH MỖI FRAME (TỐI ƯU MOBILE)
   // =========================================================
   update(delta, camera) {
-    const time = Date.now() * 0.001;
+    this._frameCount = (this._frameCount || 0) + 1;
+    this._time = (this._time || 0) + (delta || 0.016);
+    const time = this._time;
+    const isMobile = this.isMobile;
 
     // 1. Hoạt ảnh Đèn Ông Sao
     if (this.starLantern) {
-      // Đèn ông sao xoay nhẹ nhàng trong gió
       this.starLantern.rotation.y += 0.004;
       this.starLantern.position.y += Math.sin(time * 1.5) * 0.02;
 
-      // Ánh nến bên trong lập lòe chân thực
-      if (this.candleLight) {
-        this.candleLight.intensity = 2.5 + Math.sin(time * 12) * 0.4 + Math.cos(time * 19) * 0.2;
+      // Ánh nến: trên mobile chỉ update mỗi 3 frame
+      if (!isMobile || this._frameCount % 3 === 0) {
+        if (this.candleLight) {
+          this.candleLight.intensity = 2.5 + Math.sin(time * 12) * 0.4 + Math.cos(time * 19) * 0.2;
+        }
       }
 
-      // Tua rua đuôi đèn đung đưa theo gió
-      this.tassels.forEach(t => {
-        t.rotation.z = Math.sin(time * t.userData.speed) * 0.18;
-      });
+      // Tua rua: trên mobile chỉ update mỗi 2 frame
+      if (!isMobile || this._frameCount % 2 === 0) {
+        this.tassels.forEach(t => {
+          t.rotation.z = Math.sin(time * t.userData.speed) * 0.18;
+        });
+      }
     }
 
     // 1C. Khung ảnh xoay vòng quanh mặt trăng + lên xuống
     if (this.photoLanterns && this.photoLanterns.length > 0) {
+      // Billboard lookAt: trên mobile chỉ update mỗi 2 frame để tiết kiệm
+      const doBillboard = !isMobile || this._frameCount % 2 === 0;
+
       this.photoLanterns.forEach((pl, idx) => {
         const orb = pl.userData.orbit;
         if (!orb) return;
@@ -1409,7 +1422,6 @@ export class LanternManager {
         const cz = pl.userData.MOON_CZ;
 
         if (this.focusedPhotoIndex === idx) {
-          // Khi đang được focus ngắm nhìn: khóa X, Z và lơ lửng nhẹ nhàng Y, không bị trôi giật
           if (pl.userData.lockedPos === undefined) {
             pl.userData.lockedPos = { x: pl.position.x, y: pl.position.y, z: pl.position.z };
           }
@@ -1421,29 +1433,27 @@ export class LanternManager {
           );
         } else {
           pl.userData.lockedPos = undefined;
-          // Tiến góc quỹ đạo
-          orb.orbitAngle += orb.orbitSpeed * 0.016; // ~60fps
-
-          // Vị trí trên vòng tròn XZ quanh tâm trăng
+          orb.orbitAngle += orb.orbitSpeed * 0.016;
           pl.position.x = cx + orb.orbitR * Math.cos(orb.orbitAngle);
           pl.position.z = cz + orb.orbitR * Math.sin(orb.orbitAngle);
-
-          // Lên xuống theo sin — mỗi khung pha riêng
           pl.position.y = cy + Math.sin(time * orb.bobSpeed + orb.bobPhase) * orb.bobAmp;
         }
 
-        // Billboard: luôn quay mặt về phía camera
-        if (camera) pl.lookAt(camera.position);
+        // Billboard: chỉ update khi cần
+        if (doBillboard && camera) pl.lookAt(camera.position);
       });
     }
 
-    // 2. Hoạt ảnh đàn Thiên Đăng tự do bay lên trời
+    // 2. Hoạt ảnh đàn Thiên Đăng bay lên trời
+    // Mobile: chỉ sway mỗi 2 frame để tiết kiệm CPU
+    const doSway = !isMobile || this._frameCount % 2 === 0;
     this.skyLanterns.forEach(lantern => {
       lantern.position.y += lantern.userData.speedY;
-      lantern.position.x += Math.sin(time * lantern.userData.swaySpeed + lantern.userData.swayOffset) * 0.04;
-      lantern.rotation.y += lantern.userData.rotSpeed;
+      if (doSway) {
+        lantern.position.x += Math.sin(time * lantern.userData.swaySpeed + lantern.userData.swayOffset) * 0.04;
+        lantern.rotation.y += lantern.userData.rotSpeed;
+      }
 
-      // Khi bay lên quá cao, đưa về phía dưới để bay lên tiếp tạo dòng liên tục
       if (lantern.position.y > 150) {
         lantern.position.y = -65;
         lantern.position.x = THREE.MathUtils.randFloatSpread(180);
@@ -1454,14 +1464,11 @@ export class LanternManager {
     for (let i = this.wishLanterns.length - 1; i >= 0; i--) {
       const wish = this.wishLanterns[i];
       wish.position.y += wish.userData.speedY;
-      // Nhẹ nhàng hướng về phía Cung Trăng (tâm [0, 35, -70])
       wish.position.x += (0 - wish.position.x) * 0.002;
       wish.position.z += (-70 - wish.position.z) * 0.002;
       wish.rotation.y += wish.userData.rotSpeed;
 
-      // Khi đã bay rất xa lên Cung Trăng
       if (wish.position.y > wish.userData.targetY) {
-        // Giữ lại hoặc để nó lơ lửng quanh cung trăng
         wish.userData.speedY = 0.02;
       }
     }

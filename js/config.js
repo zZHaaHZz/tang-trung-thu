@@ -207,9 +207,9 @@ const CONFIG = {
 
   // Cấu hình hiệu ứng hình ảnh theo phong thủy Thổ - Kim - Thủy
   effects: {
-    starCount: 2200,            // Số lượng ngôi sao lấp lánh
-    floatingLanterns: 36,       // Số lượng đèn trời bay bổng
-    shootingStarFrequency: 3000,// Chu kỳ sao băng vút qua
+    starCount: 1800,            // Số lượng ngôi sao lấp lánh (giảm nhẹ để tối ưu)
+    floatingLanterns: 30,       // Số lượng đèn trời bay bổng
+    shootingStarFrequency: 3500,// Chu kỳ sao băng vút qua
     fireworksOnClick: false,    // Tắt pháo hoa khi chạm màn hình để tối ưu hiệu năng, chống giật lag
   }
 };
