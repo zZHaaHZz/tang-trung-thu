@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#030416" />
+  <title>Dành Tặng Linh Đan - Trung Thu Ấm Áp</title>
+
+  <!-- Favicon biểu tượng Đèn Trung Thu & Trăng -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌕</text></svg>">
+
+  <!-- Google Fonts: Hỗ trợ tiếng Việt tuyệt đẹp -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=3.0.0" />
+
+  <!-- Preload cục bộ các thư viện 3D -->
+  <link rel="modulepreload" href="js/libs/three.module.js">
+  <link rel="modulepreload" href="js/libs/OrbitControls.js">
+  <link rel="preload" as="image" href="assets/images/couple.jpg">
+  <link rel="preload" as="image" href="assets/images/bennhau.jpg">
+
+  <!-- Three.js Import Map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./js/libs/three.module.js",
+        "three/addons/controls/OrbitControls.js": "./js/libs/OrbitControls.js",
+        "three/addons/": "./js/libs/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Màn hình Loading Lung Linh (Romantic Preloader - hiện ngay 0.01s đầu tiên) -->
+  <div id="app-preloader" class="preloader-overlay">
+    <div class="preloader-content">
+      <div class="preloader-moon-ring">
+        <span class="preloader-moon">🌕</span>
+        <span class="preloader-sparkle s1">✨</span>
+        <span class="preloader-sparkle s2">🏮</span>
+      </div>
+      <h2 class="preloader-title">Đang thắp sáng Cung Trăng cho Linh Đan... ✨</h2>
+      <p class="preloader-subtitle">Chờ anh một chút nhé, món quà sắp xuất hiện rồi ❤️</p>
+      <div class="preloader-bar-wrapper">
+        <div id="preloader-bar" class="preloader-bar"></div>
+      </div>
+      <div class="preloader-status">
+        <span id="preloader-percent">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Romantic Ambient Vignette & Fog Overlay -->
+  <div class="moon-ambient-glow"></div>
+  <div class="sky-vignette"></div>
+
+  <!-- Màn hình chào ban đầu (Welcome Screen kết hợp Ảnh Nắm Tay Kỷ Niệm & Bản Mệnh) -->
+  <div id="welcome-modal" class="welcome-screen">
+    <div class="welcome-card glass-panel">
+      <!-- Khung ảnh kỷ niệm nắm tay phát sáng -->
+      <div class="couple-avatar-wrapper">
+        <div class="avatar-ring">
+          <img src="assets/images/couple.jpg" alt="Ảnh kỷ niệm bên nhau" class="couple-avatar-img"
+            onerror="this.onerror=null; this.src='assets/images/anh-dao/6.jpg';" />
+          <div class="avatar-glow"></div>
+        </div>
+        <div class="avatar-decorations">
+          <span class="sparkle-badge b1">🌕</span>
+          <span class="sparkle-badge b2">✨</span>
+          <span class="sparkle-badge b3">🏮</span>
+        </div>
+      </div>
+
+      <h1 class="welcome-title" id="welcome-names">Dành Tặng Linh Đan</h1>
+      <p class="welcome-subtitle" id="welcome-subtitle">Trung thu là Tết thiếu nhi • Thật trùng hợp khi cạnh anh có embe
+        LinhDan ✨</p>
+
+
+      <div class="welcome-tips">
+        <span><i class="fa-solid fa-headphones"></i> Hãy đeo tai nghe để cảm nhận trọn vẹn giai điệu lãng mạn</span>
+      </div>
+
+      <button id="btn-start-experience" class="btn-primary glow-btn"
+        onclick="const w=document.getElementById('welcome-modal'); if(w){w.classList.add('fade-out'); setTimeout(()=>{w.style.display='none';}, 400);} if(window.app && window.app.startExperience){window.app.startExperience();}">
+        <i class="fa-solid fa-heart"></i> Cùng Anh Ngắm Trăng Nhé
+      </button>
+    </div>
+  </div>
+
+  <!-- Giao diện lớp phủ chính (HUD Overlay) -->
+  <header class="top-nav">
+    <div class="logo-box glass-panel">
+      <div class="festival-header-row">
+        <span class="festival-badge">Tết thiếu nhi 🥮</span>
+      </div>
+      <h2 id="main-title" class="title-text">Trung Thu Ấm Áp</h2>
+      <div id="anniversary-box" class="anniversary-tag">
+        <i class="fa-solid fa-heart pulse-heart"></i>
+        <span id="anniversary-content">Bên nhau mỗi mùa trăng</span>
+      </div>
+    </div>
+
+    <!-- Nhóm nút điều khiển nhanh góc trên -->
+    <div class="top-actions">
+      <!-- Nút bật/tắt nhạc -->
+      <button id="btn-toggle-music" class="circle-btn glass-panel" title="Bật/Tắt nhạc nền">
+        <i class="fa-solid fa-music"></i>
+        <span class="music-wave">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+
+      <!-- Nút xem toàn màn hình -->
+      <button id="btn-toggle-fullscreen" class="circle-btn glass-panel" title="Toàn màn hình">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+
+      <!-- Nút giới thiệu/hướng dẫn -->
+      <button id="btn-help" class="circle-btn glass-panel" title="Hướng dẫn tương tác">
+        <i class="fa-solid fa-question"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Thanh Các Góc Nhìn Điện Ảnh Cung Trăng & Đảo Bay (Cinematic Camera Angles) -->
+  <div class="camera-angles-bar glass-panel" id="camera-angles-bar" aria-label="Góc nhìn điện ảnh">
+    <button class="angle-btn active" data-angle="island" id="btn-angle-island"
+      title="Góc Toàn Cảnh Cây Đa Trên Đảo Bay">
+      <span class="angle-emoji">🏝️</span>
+      <span class="angle-text">Đảo Cây Đa</span>
+    </button>
+    <button class="angle-btn" data-angle="rabbit" id="btn-angle-rabbit" title="Góc Chú Thỏ Ngọc Chạy Nhảy">
+      <span class="angle-emoji">🐇</span>
+      <span class="angle-text">Thỏ Ngọc</span>
+    </button>
+    <button class="angle-btn" data-angle="photo" id="btn-angle-photo" title="Góc Ảnh Của Linh Đan trong không gian 3D">
+      <span class="angle-emoji">🌸</span>
+      <span class="angle-text">Ảnh Linh Đan</span>
+    </button>
+    <button class="angle-btn" data-angle="lanterns" id="btn-angle-lanterns" title="Góc Rừng Thiên Đăng Bay Lên">
+      <span class="angle-emoji">🏮</span>
+      <span class="angle-text">Rừng Đèn Trời</span>
+    </button>
+  </div>
+
+  <!-- Thanh điều khiển tương tác chính (Bottom Action Dock) -->
+  <div class="bottom-dock">
+    <button id="btn-open-letter" class="dock-btn glass-panel" title="Mở bức thư tình Cung Trăng">
+      <div class="btn-icon-wrapper"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <span>Thư Tình</span>
+    </button>
+
+    <button id="btn-wish-lantern" class="dock-btn glass-panel highlight-dock-btn"
+      title="Thả hoa đăng / thiên đăng ước nguyện">
+      <div class="btn-icon-wrapper"><i class="fa-solid fa-fire-flame-curved"></i></div>
+      <span>Thả Đèn</span>
+    </button>
+
+    <button id="btn-quick-kiss" class="dock-btn glass-panel" title="Gửi ngàn nụ hôn 💋 ấm áp">
+      <div class="btn-icon-wrapper"><span style="font-size: 1.25rem;">💋</span></div>
+      <span>Gửi Nụ Hôn</span>
+    </button>
+
+    <button id="btn-dao-photos" class="dock-btn glass-panel" title="Ngắm trọn bộ ảnh của Linh Đan trong không gian 3D">
+      <div class="btn-icon-wrapper"><span style="font-size: 1.2rem;">🌸</span></div>
+      <span>Ảnh Linh Đan</span>
+    </button>
+
+    <button id="btn-fireworks" class="dock-btn glass-panel" title="Bắn pháo hoa ánh sáng chúc mừng">
+      <div class="btn-icon-wrapper"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <span>Pháo Hoa</span>
+    </button>
+  </div>
+
+  <!-- THANH ĐIỀU KHIỂN XEM ẢNH CỦA LINH ĐAN TRONG KHÔNG GIAN 3D (Floating 3D Photo Tour HUD) -->
+  <div id="photo-tour-bar" class="photo-tour-bar glass-panel hidden">
+    <div class="tour-header-row">
+      <div class="tour-info">
+        <span class="tour-badge">🌸 Góc Ảnh Linh Đan</span>
+        <span class="tour-counter" id="tour-counter">1 / 6</span>
+      </div>
+      <button id="btn-exit-tour" class="tour-exit-btn" title="Quay lại toàn cảnh Cung Trăng">
+        <i class="fa-solid fa-moon"></i> <span>Về Cung Trăng</span>
+      </button>
+    </div>
+
+    <p class="tour-caption-text" id="tour-caption">Em bé Linh Đan xinh xắn đáng yêu của anh ❤️</p>
+
+    <div class="tour-nav-row">
+      <button id="btn-tour-prev" class="tour-btn" title="Ảnh trước">
+        <i class="fa-solid fa-chevron-left"></i> <span>Trước</span>
+      </button>
+      <button id="btn-tour-play" class="tour-btn tour-play-btn" title="Tự động chuyển góc ngắm ảnh">
+        <i class="fa-solid fa-play" id="tour-play-icon"></i> <span id="tour-play-text">Tự Động Chiếu</span>
+      </button>
+      <button id="btn-tour-next" class="tour-btn" title="Ảnh tiếp theo">
+        <span>Sau</span> <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Gợi ý tương tác mượt mà -->
+  <div class="interaction-hint">
+    <i class="fa-solid fa-hand-pointer"></i> <span>Chạm/Kéo để xoay 360° • Click bất kỳ để bắn pháo hoa</span>
+  </div>
+
+  <!-- MODAL: BỨC THƯ TÌNH CUNG TRĂNG (Kèm Khung Ảnh Polaroid Phát Sáng) -->
+  <div id="letter-modal" class="modal-backdrop hidden">
+    <div class="letter-card glass-panel-modal">
+      <button id="btn-close-letter" class="close-modal-btn">&times;</button>
+
+      <div class="letter-header-decor">
+        <span class="decor-moon">🌙</span>
+        <span class="decor-stars">✦ ✧ ✦</span>
+      </div>
+
+      <div class="letter-content-scroll">
+        <h3 id="letter-title" class="letter-heading">Gửi Em - Ánh Trăng Của Lòng Anh</h3>
+
+        <!-- Khung ảnh bo tròn phát sáng kỷ niệm trong thư tình -->
+        <div class="letter-avatar-wrapper">
+          <div class="letter-avatar-ring">
+            <img src="assets/images/bennhau.jpg" alt="Ảnh kỷ niệm bên nhau" class="letter-avatar-img"
+              id="polaroid-img-element" />
+            <div class="avatar-glow"></div>
+          </div>
+          <div class="letter-avatar-caption" id="polaroid-caption">
+            Bên nhau bình yên như thế này thôi ❤️
+          </div>
+          <!-- Chuyển đổi xem ảnh bên nhau / ảnh nắm tay -->
+          <div class="photo-tabs">
+            <button class="photo-tab-btn active" id="tab-photo-together">📸 Bên nhau</button>
+          </div>
+        </div>
+
+        <div id="typewriter-body" class="typewriter-area">
+          <!-- Nội dung thư sẽ được gõ chữ tự động -->
+        </div>
+
+        <div class="letter-closing" id="letter-signature">
+          <!-- Chữ ký -->
+        </div>
+      </div>
+
+      <div class="letter-footer">
+        <button id="btn-letter-kiss" class="btn-primary mini-glow">
+          <span style="font-size: 1.2em; margin-right: 4px;">💋</span> Gửi Ngàn Nụ Hôn Cho Em
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ALBUM ẢNH KỶ NIỆM & ẢNH CỦA LINH ĐAN -->
+  <div id="photo-modal" class="modal-backdrop hidden">
+    <div class="photo-album-card glass-panel-modal">
+      <button id="btn-close-photo" class="close-modal-btn">&times;</button>
+
+      <div class="album-header">
+        <span class="album-header-icon">📸</span>
+        <h3 class="album-title">Khoảnh Khắc Của Linh Đan</h3>
+        <p class="album-subtitle">Ánh sáng dịu dàng và ấm áp nhất trong lòng anh ✨</p>
+      </div>
+
+      <!-- Khung ảnh Polaroid phát sáng nghệ thuật -->
+      <div class="album-viewer-wrapper">
+        <button id="btn-prev-photo" class="album-nav-arrow prev-arrow" title="Ảnh trước">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="album-polaroid-frame">
+          <div class="album-img-container">
+            <img id="album-main-img" src="assets/images/bennhau.jpg" alt="Ảnh kỷ niệm của Linh Đan"
+              class="album-display-img" />
+            <div class="album-img-glow"></div>
+          </div>
+          <div class="album-caption-box">
+            <p id="album-photo-caption" class="album-caption-text">Bên nhau bình yên như thế này thôi ❤️</p>
+            <span id="album-counter" class="album-counter-badge">1 / 1</span>
+          </div>
+        </div>
+
+        <button id="btn-next-photo" class="album-nav-arrow next-arrow" title="Ảnh tiếp theo">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Dải ảnh thu nhỏ Thumbnails để chạm chọn nhanh -->
+      <div id="album-thumbnails" class="album-thumbnails-bar"></div>
+
+      <div class="album-footer">
+        <button id="btn-album-kiss" class="btn-primary mini-glow">
+          <span style="font-size: 1.2em; margin-right: 4px;">💋</span> Gửi Ngàn Yêu Thương Cho Linh Đan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: THẢ ĐÈN TRỜI & PHIẾU HẸN ƯỚC YÊU XA (Redesigned Tabbed Experience) -->
+  <div id="wish-modal" class="modal-backdrop hidden">
+    <div class="wish-card glass-panel-modal">
+      <button id="btn-close-wish" class="close-modal-btn">&times;</button>
+
+      <div class="wish-header">
+        <div class="lantern-icon-large">🏮</div>
+        <h3>Thả Đèn Cung Trăng</h3>
+        <p>Gửi ước nguyện hoặc rút Phiếu Hẹn Ước cam kết ngoài đời cùng Anh ❤️</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="wish-tabs-bar">
+        <button id="tab-btn-voucher" class="wish-tab-btn active" type="button">
+          <i class="fa-solid fa-ticket"></i> Phiếu Hẹn Ước Yêu Xa
+        </button>
+        <button id="tab-btn-custom" class="wish-tab-btn" type="button">
+          <i class="fa-solid fa-feather-pointed"></i> Tự Viết Lời Ước
+        </button>
+      </div>
+
+      <!-- TAB 1: PHIẾU HẸN ƯỚC YÊU XA -->
+      <div id="tab-panel-voucher" class="wish-tab-panel active">
+        <div class="voucher-list-scroll" id="vouchers-list">
+          <!-- Render danh sách thẻ full-width đẹp từ config.vouchers -->
+        </div>
+
+        <div class="voucher-custom-note-wrap">
+          <input type="text" id="voucher-custom-note" placeholder="Lời nhắn gửi thêm cho Anh nếu có (tuỳ chọn)..."
+            maxlength="100" />
+        </div>
+
+        <div class="wish-actions">
+          <button id="btn-send-voucher-wish" class="btn-primary glow-btn btn-full">
+            <i class="fa-solid fa-paper-plane"></i> Thả Đèn & Nhận Vé Cam Kết ✨
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: TỰ GÕ ĐIỀU ƯỚC BÍ MẬT -->
+      <div id="tab-panel-custom" class="wish-tab-panel">
+        <div class="wish-input-group">
+          <label for="custom-wish-text"><i class="fa-solid fa-pen-nib"></i> Lời ước nguyện từ trái tim Linh Đan:</label>
+          <textarea id="custom-wish-text" rows="3"
+            placeholder="Nhập điều ước hoặc lời dặn dò của em gửi lên cung trăng..." maxlength="140"></textarea>
+        </div>
+
+        <div class="preset-wishes-label">Hoặc chọn nhanh lời chúc ấm áp:</div>
+        <div id="preset-wishes-container" class="preset-wishes-list">
+          <!-- Tự động đổ từ config.wishPresets -->
+        </div>
+
+        <div class="wish-actions">
+          <button id="btn-send-custom-wish" class="btn-primary glow-btn btn-full">
+            <i class="fa-solid fa-paper-plane"></i> Thả Đèn Lên Cung Trăng 🏮
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: TẤM VÉ HẸN ƯỚC TÌNH YÊU (Love Voucher Ticket Modal) -->
+  <div id="voucher-modal" class="modal-backdrop hidden">
+    <div class="voucher-ticket-wrapper glass-panel-modal">
+      <button id="btn-close-voucher-x" class="close-modal-btn">&times;</button>
+
+      <!-- Thẻ vé tình yêu phong cách vé vàng / chứng nhận -->
+      <div class="voucher-ticket">
+        <div class="ticket-header">
+          <div class="ticket-badge">🌕 VÉ HẸN ƯỚC TRUNG THU</div>
+          <h2 class="ticket-title" id="ticket-title">Ting Ting Trà Sữa / Bữa Đêm</h2>
+          <span class="ticket-tag" id="ticket-tag">Thực hiện ngay hôm nay</span>
+        </div>
+
+        <div class="ticket-divider">
+          <span class="notch notch-left"></span>
+          <span class="dashed-line"></span>
+          <span class="notch notch-right"></span>
+        </div>
+
+        <div class="ticket-body">
+          <div class="ticket-icon-box">
+            <span class="ticket-big-icon" id="ticket-icon">🧋</span>
+            <div class="ticket-stamp">ĐÃ KÝ DUYỆT<br>❤️ ANH YÊU ❤️</div>
+          </div>
+
+          <div class="ticket-desc" id="ticket-desc">
+            Anh phải ting ting hoặc order ngay 1 ly trà sữa / món ăn đêm nóng hổi theo ý Linh Đan!
+          </div>
+
+          <div class="ticket-commitment-box">
+            <strong><i class="fa-solid fa-handshake"></i> Lời hứa danh dự của Anh:</strong>
+            <p id="ticket-commitment">Anh cam kết sẽ mở app chuyển khoản hoặc order ngay món Linh Đan thèm không chậm trễ 1
+              phút!</p>
+          </div>
+
+          <div class="ticket-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Người thụ hưởng:</span>
+              <span class="meta-val">Linh Đan (Ốc Thượng Thổ 🏡)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Người thực hiện:</span>
+              <span class="meta-val">Anh (Tuyền Trung Thủy 💧)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Mã vé bảo chứng:</span>
+              <span class="meta-val code-font" id="ticket-code">LDR-TRASUA-LINHDAN</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Thời hạn:</span>
+              <span class="meta-val highlight-gold">Vĩnh Viễn ✨</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-footer-actions">
+          <button id="btn-claim-voucher" class="btn-primary glow-btn btn-full">
+            <i class="fa-solid fa-share-from-square"></i> Bắt Đền Anh Ngay (Copy Tin Nhắn)
+          </button>
+          <button id="btn-close-voucher" class="btn-secondary mini-btn">
+            <i class="fa-solid fa-moon"></i> Đã Lưu Vé, Tiếp Tục Ngắm Trăng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-box" class="toast-box hidden">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-text">Đã sao chép lời nhắn! Hãy gửi ngay cho Anh nhé 💋</span>
+  </div>
+
+  <!-- MODAL: HƯỚNG DẪN TƯƠNG TÁC -->
+  <div id="help-modal" class="modal-backdrop hidden">
+    <div class="help-card glass-panel-modal">
+      <button id="btn-close-help" class="close-modal-btn">&times;</button>
+      <h3>Khám Phá Cung Trăng 3D</h3>
+      <ul class="help-guide-list">
+        <li><i class="fa-solid fa-arrows-spin"></i> <strong>Xoay góc nhìn:</strong> Nhấn giữ chuột trái hoặc dùng 1 ngón
+          tay vuốt trên màn hình để bay quanh mặt trăng.</li>
+        <li><i class="fa-solid fa-magnifying-glass-plus"></i> <strong>Phóng to/thu nhỏ:</strong> Dùng con lăn chuột hoặc
+          chụm 2 ngón tay trên điện thoại.</li>
+        <li><i class="fa-solid fa-sparkles"></i> <strong>Bắn pháo hoa:</strong> Nhấn trực tiếp vào bất kỳ vị trí nào
+          trên bầu trời.</li>
+        <li><i class="fa-solid fa-fire"></i> <strong>Thả thiên đăng:</strong> Bấm nút "Thả Đèn Trời" để tự tay thả chiếc
+          đèn lồng ghi lời chúc của mình.</li>
+      </ul>
+      <button id="btn-help-ok" class="btn-primary mini-glow" style="margin-top: 15px;">Đã hiểu, tiếp tục ngắm
+        trăng</button>
+    </div>
+  </div>
+
+  <!-- Âm thanh audio element (kết hợp synthesizer dự phòng & danh sách phát) -->
+  <audio id="bgm-audio" preload="auto"></audio>
+
+  <!-- Main 3D JavaScript Module (tự động nạp config.js và khởi tạo hệ thống 3D) -->
+  <script type="module" src="js/main.js?v=3.0.0"></script>
+
+  <!-- Failsafe: Đảm bảo màn hình loading luôn tắt sau tối đa 2.8s -->
+  <script>
+    setTimeout(function () {
+      var p = document.getElementById('app-preloader');
+      if (p && p.style.display !== 'none') {
+        p.classList.add('fade-out');
+        setTimeout(function () { p.style.display = 'none'; }, 500);
+      }
+    }, 2800);
+  </script>
+</body>
+
+</html>
