@@ -445,25 +445,24 @@ class MidAutumnApp {
             console.warn('Audio play notice:', audioErr);
           }
 
-          // Bắn cụm pháo hoa chào mừng rực rỡ giữa bầu trời đêm
-          setTimeout(() => {
-            try {
-              if (this.fireworks) {
-                this.fireworks.spawn(-20, 25, -20);
-                this.fireworks.spawn(20, 30, -30);
-                this.fireworks.spawn(0, 40, -40);
-              }
-            } catch (fwErr) {
-              console.warn('Fireworks notice:', fwErr);
-            }
-          }, 350);
-
           // Hiệu ứng di chuyển camera mở màn điện ảnh tiến vào ngắm Trăng & Khung ảnh
           try {
             if (this.camera && this.controls) this.animateCameraIntro();
           } catch (camErr) {
             console.warn('Camera intro notice:', camErr);
           }
+
+          // Mở thư tình ngay sau khi bắt đầu
+          setTimeout(() => {
+            try {
+              if (letterModal) {
+                letterModal.classList.remove('hidden');
+                this.startTypewriterEffect();
+              }
+            } catch (ltErr) {
+              console.warn('Letter open notice:', ltErr);
+            }
+          }, 800);
 
           // Báo tin ngầm về Telegram khi Linh Đan bắt đầu trải nghiệm (1 lần / phiên)
           if (!this.hasNotifiedVisit) {
@@ -816,32 +815,25 @@ class MidAutumnApp {
         const isPortrait = window.innerWidth < window.innerHeight;
         const wideCamPos = new THREE.Vector3(0, 30, isPortrait ? 140 : 120);
         const skyTarget  = new THREE.Vector3(0, 22, -60);
-        const BARRAGE_DURATION = 4800;
+        const BARRAGE_DURATION = 2800;
 
         const launchFireworksBarrage = () => {
+          // Giảm xuống 7 quả pháo hoa để tối ưu hiệu năng mobile
           const sequence = [
-            { x:  -70, y: 28, z: -55, delay:    0 },
-            { x:   70, y: 32, z: -55, delay:  300 },
-            { x:    0, y: 62, z: -60, delay:  650 },
-            { x:  -45, y: 42, z: -50, delay: 1050 },
-            { x:   45, y: 45, z: -50, delay: 1350 },
-            { x:  -20, y: 35, z: -45, delay: 1700 },
-            { x:   22, y: 38, z: -45, delay: 1950 },
-            { x:    0, y: 55, z: -58, delay: 2350 },
-            { x:  -60, y: 50, z: -52, delay: 2700 },
-            { x:   60, y: 48, z: -52, delay: 2950 },
-            { x:  -30, y: 65, z: -60, delay: 3300 },
-            { x:   30, y: 62, z: -60, delay: 3550 },
-            { x:    0, y: 40, z: -48, delay: 3900 },
-            { x:  -50, y: 38, z: -50, delay: 4200 },
-            { x:   50, y: 42, z: -50, delay: 4500 },
+            { x:  -50, y: 28, z: -55, delay:    0 },
+            { x:   50, y: 32, z: -55, delay:  400 },
+            { x:    0, y: 55, z: -60, delay:  800 },
+            { x:  -30, y: 40, z: -50, delay: 1200 },
+            { x:   30, y: 42, z: -50, delay: 1600 },
+            { x:    0, y: 48, z: -58, delay: 2000 },
+            { x:    0, y: 35, z: -45, delay: 2400 },
           ];
 
           sequence.forEach(fw => {
             setTimeout(() => { this.fireworks.spawn(fw.x, fw.y, fw.z); }, fw.delay);
           });
 
-          // Bật lại autoRotate sau khi toàn bộ barrage kết thúc
+          // Bật lại autoRotate sau khi bắt cầu kết thúc
           setTimeout(() => {
             if (!this.isPhotoTourActive) this.controls.autoRotate = true;
           }, BARRAGE_DURATION);
