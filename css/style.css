@@ -2434,3 +2434,78 @@ textarea, input {
     font-size: 1rem;
   }
 }
+
+/* =========================================================
+   ⚡ TỐI ƯU HIỆU NĂNG MOBILE / GPU COMPOSITING
+   ========================================================= */
+
+/* Canvas WebGL: đẩy lên GPU layer riêng, tránh repaint toàn trang */
+#canvas-container,
+#canvas-container canvas {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Overlay UI: dùng contain để browser không reflow toàn cây */
+.top-nav,
+.bottom-dock,
+.camera-angles-bar,
+.interaction-hint,
+.toast-box {
+  contain: layout style;
+}
+
+/* Modal: tách layer riêng khi hiện */
+.modal-backdrop:not(.hidden) {
+  will-change: opacity;
+}
+
+/* =========================================================
+   📱 MOBILE (TOUCH/COARSE POINTER): Giảm chi phí compositing
+   ========================================================= */
+@media (pointer: coarse) {
+  /* Giảm backdrop-filter blur xuống còn 10px (từ 16-20px) để tiết kiệm GPU fill */
+  .glass-panel,
+  .glass-panel-modal,
+  .top-nav .logo-box,
+  .bottom-dock .dock-btn,
+  .camera-angles-bar {
+    backdrop-filter: blur(10px) saturate(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+  }
+
+  /* Loại bỏ box-shadow nhiều lớp phức tạp trên các nút */
+  .dock-btn,
+  .circle-btn,
+  .angle-btn {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Avatar glow pulse: dùng opacity thay transform để tránh layer mới */
+  .avatar-glow {
+    animation: none;
+    opacity: 0.55;
+  }
+
+  /* Tắt preloader-sparkle bounce để giảm tải khi khởi động */
+  .preloader-sparkle {
+    animation-duration: 2.5s;
+  }
+}
+
+/* =========================================================
+   ♿ PREFERS-REDUCED-MOTION: Tắt animation cho người dùng nhạy cảm
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

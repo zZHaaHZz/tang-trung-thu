@@ -160,10 +160,10 @@ class MidAutumnApp {
       depth: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // Mobile: dùng pixelRatio tối đa 1.5 để cân bằng nét và hiệu năng
+    // Mobile: dùng pixelRatio tối đa 1.2 để giảm fill-rate trên GPU yếu
     // Desktop Retina: dùng tối đa 2.0
     const pixelRatio = isMobile
-      ? Math.min(window.devicePixelRatio || 1, 1.5)
+      ? Math.min(window.devicePixelRatio || 1, 1.2)
       : Math.min(window.devicePixelRatio || 1, 2.0);
     this.renderer.setPixelRatio(pixelRatio);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1700,16 +1700,34 @@ class MidAutumnApp {
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     const newPixelRatio = isMobile
-      ? Math.min(window.devicePixelRatio || 1, 1.5)
+      ? Math.min(window.devicePixelRatio || 1, 1.2)
       : Math.min(window.devicePixelRatio || 1, 2.0);
     this.renderer.setPixelRatio(newPixelRatio);
   }
 
-  // Vòng lặp render chính (60fps) được bọc try-catch tuyệt đối an toàn
+  // Vòng lặp render chính — tối ưu mobile: 30fps throttle + dừng khi tab ẩn
   animate() {
     if (!this.renderer || !this.scene || !this.camera) return;
-    requestAnimationFrame(() => this.animate());
 
+    // Page Visibility API: dừng render khi tab bị ẩn để tiết kiệm pin
+    if (document.hidden) {
+      this._rafId = requestAnimationFrame(() => this.animate());
+      return;
+    }
+
+    // Mobile frame throttle: giới hạn 30fps để giảm tải GPU/CPU
+    if (this.isMobile) {
+      const now = performance.now();
+      if (!this._lastFrameTime) this._lastFrameTime = now;
+      const elapsed = now - this._lastFrameTime;
+      if (elapsed < 33.3) { // ~30fps = 33.3ms mỗi frame
+        this._rafId = requestAnimationFrame(() => this.animate());
+        return;
+      }
+      this._lastFrameTime = now - (elapsed % 33.3);
+    }
+
+    this._rafId = requestAnimationFrame(() => this.animate());
     const delta = this.clock.getDelta();
 
     try {
