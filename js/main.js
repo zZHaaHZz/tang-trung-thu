@@ -1407,7 +1407,6 @@ class MidAutumnApp {
     document.body.classList.add('photo-tour-active');
     this.focusPhotoLantern(startIndex);
     this.startPhotoTourAutoplay();
-    this.showToast('🌸 Đang ngắm góc ảnh của Linh Đan & tự động chuyển ảnh ✨');
   }
 
   focusPhotoLantern(index, isAuto = false) {
@@ -1479,10 +1478,8 @@ class MidAutumnApp {
   togglePhotoTourAutoplay() {
     if (this.photoTourAutoplayTimer) {
       this.stopPhotoTourAutoplay();
-      this.showToast('⏸ Đã tạm dừng trình chiếu ảnh');
     } else {
       this.startPhotoTourAutoplay();
-      this.showToast('▶ Tiếp tục tự động chuyển ảnh của Linh Đan ❤️');
     }
   }
 
@@ -1583,7 +1580,6 @@ class MidAutumnApp {
     if (this.audio) {
       this.audio.playWishChime();
     }
-    this.showToast('📸 Đang mở Album ảnh của Linh Đan ❤️');
   }
 
   navigatePhoto(direction) {
